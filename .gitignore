@@ -30,3 +30,13 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# Docker volumes
+vector_db/
+phoenix_data/
+data/
+logs/
+
+# Build artifacts
+bin/
+docs/adk/

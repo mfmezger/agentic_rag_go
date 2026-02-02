@@ -1,0 +1,41 @@
+# Agentic RAG Configuration
+
+model:
+  name: "gemini-2.5-flash"
+  embedding_model: "gemini-embedding-001"
+  # api_key loaded from env: GOOGLE_API_KEY
+  temperature: 0.7
+  max_tokens: 2048
+
+agent:
+  name: "rag_agent"
+  description: "An intelligent RAG agent for answering questions."
+  instruction: |
+    You are a helpful RAG assistant. Answer questions based on the provided context.
+    If the context doesn't contain relevant information, say so clearly.
+    Always cite your sources when possible.
+
+vectorstore:
+  provider: "qdrant"
+  url: "localhost"          # Host only, port is separate
+  grpc_port: 6334           # gRPC port for Qdrant
+  collection: "agenticraggo"
+  vector_size: 768          # Embedding dimension
+
+retriever:
+  top_k: 10
+  min_score: 0.7
+  chunk_size: 512
+  chunk_overlap: 50
+
+server:
+  host: "0.0.0.0"
+  port: 8001
+  api_key: ""
+  rate_limit: 100
+  rate_window: 60
+
+tracing:
+  enabled: false
+  endpoint: "http://phoenix:4317"
+  service_name: "agentic-rag-go"

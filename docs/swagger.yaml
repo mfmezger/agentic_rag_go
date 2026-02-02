@@ -1,0 +1,201 @@
+basePath: /api/v1
+definitions:
+  api.ChatRequest:
+    properties:
+      message:
+        example: What is machine learning?
+        type: string
+      session_id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      user_id:
+        example: user123
+        type: string
+    type: object
+  api.ChatResponse:
+    properties:
+      response:
+        type: string
+      session_id:
+        type: string
+    type: object
+  api.ErrorResponse:
+    properties:
+      error:
+        example: Invalid request body
+        type: string
+    type: object
+  api.SearchRequest:
+    properties:
+      query:
+        example: What is machine learning?
+        type: string
+      top_k:
+        example: 5
+        type: integer
+    type: object
+  api.SearchResponse:
+    properties:
+      results:
+        items:
+          $ref: '#/definitions/api.SearchResultItem'
+        type: array
+    type: object
+  api.SearchResultItem:
+    properties:
+      content:
+        example: Machine learning is...
+        type: string
+      id:
+        example: 550e8400-e29b-41d4-a716-446655440000
+        type: string
+      metadata:
+        additionalProperties:
+          type: string
+        type: object
+      score:
+        example: 0.95
+        type: number
+    type: object
+  api.UploadTextRequest:
+    properties:
+      metadata:
+        additionalProperties:
+          type: string
+        example:
+          author: John Doe
+        type: object
+      source:
+        example: document.pdf
+        type: string
+      text:
+        example: Your document text goes here...
+        type: string
+    type: object
+  api.UploadTextResponse:
+    properties:
+      chunk_count:
+        example: 5
+        type: integer
+      chunk_ids:
+        items:
+          type: string
+        type: array
+      message:
+        example: Text uploaded and chunked successfully
+        type: string
+    type: object
+host: localhost:8001
+info:
+  contact: {}
+  description: REST API for Retrieval-Augmented Generation with Qdrant vector store
+  title: Agentic RAG API
+  version: "1.0"
+paths:
+  /chat:
+    post:
+      consumes:
+      - application/json
+      description: Send a message to the RAG agent which searches internal docs first,
+        then web
+      parameters:
+      - description: Chat message
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/api.ChatRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.ChatResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: Chat with RAG agent
+      tags:
+      - chat
+  /health:
+    get:
+      description: Returns the health status of the API
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check
+      tags:
+      - health
+  /search:
+    post:
+      consumes:
+      - application/json
+      description: Search for documents using hybrid vector search
+      parameters:
+      - description: Search query
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/api.SearchRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.SearchResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: Search documents
+      tags:
+      - search
+  /upload_text:
+    post:
+      consumes:
+      - application/json
+      description: Chunks text and stores it in the vector database for retrieval
+      parameters:
+      - description: Text to upload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/api.UploadTextRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/api.UploadTextResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      summary: Upload text
+      tags:
+      - documents
+swagger: "2.0"

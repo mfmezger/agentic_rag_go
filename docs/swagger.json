@@ -1,0 +1,301 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "REST API for Retrieval-Augmented Generation with Qdrant vector store",
+        "title": "Agentic RAG API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8001",
+    "basePath": "/api/v1",
+    "paths": {
+        "/chat": {
+            "post": {
+                "description": "Send a message to the RAG agent which searches internal docs first, then web",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chat"
+                ],
+                "summary": "Chat with RAG agent",
+                "parameters": [
+                    {
+                        "description": "Chat message",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.ChatRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.ChatResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "description": "Returns the health status of the API",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Health check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/search": {
+            "post": {
+                "description": "Search for documents using hybrid vector search",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "search"
+                ],
+                "summary": "Search documents",
+                "parameters": [
+                    {
+                        "description": "Search query",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.SearchRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.SearchResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/upload_text": {
+            "post": {
+                "description": "Chunks text and stores it in the vector database for retrieval",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "documents"
+                ],
+                "summary": "Upload text",
+                "parameters": [
+                    {
+                        "description": "Text to upload",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.UploadTextRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/api.UploadTextResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "api.ChatRequest": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "What is machine learning?"
+                },
+                "session_id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "user_id": {
+                    "type": "string",
+                    "example": "user123"
+                }
+            }
+        },
+        "api.ChatResponse": {
+            "type": "object",
+            "properties": {
+                "response": {
+                    "type": "string"
+                },
+                "session_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Invalid request body"
+                }
+            }
+        },
+        "api.SearchRequest": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "example": "What is machine learning?"
+                },
+                "top_k": {
+                    "type": "integer",
+                    "example": 5
+                }
+            }
+        },
+        "api.SearchResponse": {
+            "type": "object",
+            "properties": {
+                "results": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.SearchResultItem"
+                    }
+                }
+            }
+        },
+        "api.SearchResultItem": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string",
+                    "example": "Machine learning is..."
+                },
+                "id": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "score": {
+                    "type": "number",
+                    "example": 0.95
+                }
+            }
+        },
+        "api.UploadTextRequest": {
+            "type": "object",
+            "properties": {
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "author": "John Doe"
+                    }
+                },
+                "source": {
+                    "type": "string",
+                    "example": "document.pdf"
+                },
+                "text": {
+                    "type": "string",
+                    "example": "Your document text goes here..."
+                }
+            }
+        },
+        "api.UploadTextResponse": {
+            "type": "object",
+            "properties": {
+                "chunk_count": {
+                    "type": "integer",
+                    "example": 5
+                },
+                "chunk_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Text uploaded and chunked successfully"
+                }
+            }
+        }
+    }
+}

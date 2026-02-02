@@ -1,0 +1,40 @@
+# Qdrant configuration
+# See: https://qdrant.tech/documentation/guides/configuration/
+
+storage:
+  # Storage path
+  storage_path: /qdrant/storage
+
+  # Snapshots storage path
+  snapshots_path: /qdrant/snapshots
+
+  # Optimizers configuration
+  optimizers:
+    # Number of segments to create
+    default_segment_number: 2
+    
+    # Maximum size of vectors in segment (in KBs)
+    max_segment_size_kb: 100000
+    
+    # Maximum number of vectors in segment
+    memmap_threshold_kb: 200000
+    
+    # Indexing threshold
+    indexing_threshold_kb: 20000
+
+service:
+  # gRPC port
+  grpc_port: 6334
+  
+  # HTTP port  
+  http_port: 6333
+  
+  # Enable CORS
+  enable_cors: true
+
+# Cluster configuration (disabled for single node)
+cluster:
+  enabled: false
+
+# Telemetry (optional - disable if not needed)
+telemetry_disabled: false

@@ -1,0 +1,43 @@
+# Agentic RAG Configuration Example
+# Copy this file to config.yaml and update the values
+
+# Model settings
+model:
+  name: "gemini-2.0-flash"
+  temperature: 0.7
+  max_tokens: 2048
+
+# Agent settings
+agent:
+  name: "rag_agent"
+  description: "An intelligent RAG agent for answering questions."
+  instruction: |
+    You are a helpful RAG assistant. Answer questions based on the provided context.
+    If the context doesn't contain relevant information, say so clearly.
+    Always cite your sources when possible.
+
+# Vector store settings
+vectorstore:
+  provider: "qdrant"  # Options: qdrant, weaviate, pinecone
+  url: "localhost:6333"
+  collection: "documents"
+
+# Retriever settings
+retriever:
+  top_k: 5
+  min_score: 0.7
+  chunk_size: 512
+  chunk_overlap: 50
+
+# Server settings
+server:
+  port: 8080
+  host: "0.0.0.0"
+  api_key: ""              # Optional: Set to enable API key authentication via X-API-Key header
+  rate_limit: 100          # Requests per time window (0 = unlimited)
+  rate_window: 60         # Time window in seconds
+
+# Logging settings
+logging:
+  level: "info"  # Options: debug, info, warn, error
+  format: "json" # Options: json, text

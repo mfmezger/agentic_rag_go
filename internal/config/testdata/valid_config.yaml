@@ -1,0 +1,26 @@
+model:
+  name: gemini-2.5-flash
+  embedding_model: gemini-embedding-001
+  api_key: test-api-key-123
+  temperature: 0.7
+
+vectorstore:
+  url: localhost
+  grpc_port: 6334
+  collection: test_collection
+  vector_size: 768
+
+retriever:
+  top_k: 5
+  chunk_size: 1000
+  chunk_overlap: 200
+
+agent:
+  name: TestRAGAgent
+  description: A test RAG agent for unit testing
+  instruction: You are a helpful test assistant.
+
+tracing:
+  enabled: true
+  endpoint: http://localhost:6006
+  service_name: test-service

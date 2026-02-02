@@ -1,0 +1,5 @@
+model:
+  name: gemini-2.5-flash
+  embedding_model: [this is invalid yaml syntax
+    missing closing bracket
+  temperature: "not a number"

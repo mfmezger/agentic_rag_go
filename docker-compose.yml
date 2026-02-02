@@ -1,0 +1,72 @@
+services:
+  agent:
+    build: .
+    platform: linux/amd64
+    volumes:
+      - ./data:/data
+      - ./logs:/logs
+    depends_on:
+      qdrant:
+        condition: service_healthy
+      phoenix:
+        condition: service_started
+    ports:
+      - "8001:8001"
+    env_file:
+      - .env
+    environment:
+      - QDRANT_URL=http://qdrant:6333
+      - PHOENIX_COLLECTOR_ENDPOINT=http://phoenix:6006/v1/traces
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://phoenix:4317
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrantgo
+    command: ["./qdrant", "--config-path", "config/qdrant.yaml"]
+    volumes:
+      - ./vector_db:/qdrant/storage
+      - ./config/qdrant.yaml:/qdrant/config/qdrant.yaml
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "1"
+        max-size: "10m"
+    deploy:
+      resources:
+        limits:
+          memory: 2Gb
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/livez"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  phoenix:
+    image: arizephoenix/phoenix:latest
+    container_name: phoenixgo
+    ports:
+      - "6006:6006"   # Phoenix UI
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+    environment:
+      - PHOENIX_WORKING_DIR=/mnt/data
+    volumes:
+      - ./phoenix_data:/mnt/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6006/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+
+volumes:
+  vector_db:
+  phoenix_data:
